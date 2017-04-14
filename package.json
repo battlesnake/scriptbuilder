@@ -1,0 +1,21 @@
+{
+  "name": "scriptbuilder",
+  "version": "1.0.0",
+  "description": "shell script builder and sanitiser",
+  "main": "bin/module",
+  "scripts": {
+    "postinstall": "make"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/battlesnake/scriptbuilder"
+  },
+  "author": "Mark K Cowan",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-latest": "^6.24.1",
+    "lodash": "^4.17.4",
+    "source-map-support": "^0.4.14"
+  }
+}
