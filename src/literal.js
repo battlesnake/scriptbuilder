@@ -7,4 +7,6 @@ const Literal = (...args) => {
 	return no_quote ? s : `'${s.replace(/'/g, '\'\\\'\'')}'`;
 };
 
+Literal.list = (...args) => args.map(s => Literal(s));
+
 export default Literal;

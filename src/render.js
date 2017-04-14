@@ -29,4 +29,12 @@ function render_all(cmds) {
 	}
 }
 
-export default render_all;
+function render_string(cmds) {
+	return render_all(cmds).join('\n');
+}
+
+export default {
+	all: render_all,
+	one: render_one,
+	string: render_string
+};
