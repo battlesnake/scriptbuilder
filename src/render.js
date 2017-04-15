@@ -1,25 +1,26 @@
 import _ from 'lodash';
+import Fragment from './fragment';
 import $literal from './literal';
 
 const indent = s => `\t${s}`;
 
-const is_block = cmd => cmd && typeof cmd.$render === 'function';
+const is_block = cmd => cmd instanceof Fragment;
 
 function render_one(cmd) {
 	if (typeof cmd === 'string') {
 		return [cmd];
 	} else if (cmd instanceof Array) {
-		return render_all(cmd).map(indent);
+		return render_block(cmd).map(indent);
 	} else {
-		return render_all(cmd);
+		return render_block(cmd);
 	}
 }
 
-function render_all(cmds) {
+function render_block(cmds) {
 	if (typeof cmds === 'string') {
 		return [cmds];
 	} else if (is_block(cmds)) {
-		return render_all(cmds.$render());
+		return render_block(cmds.$render());
 	} else if (cmds instanceof Array) {
 		return _.flatMap(cmds, render_one);
 	} else {
@@ -30,13 +31,47 @@ function render_all(cmds) {
 	}
 }
 
-const render_string = cmds => render_all(cmds).join('\n');
+function render_word(word) {
+	if (typeof word === 'string') {
+		return word;
+	} else if (word instanceof Fragment) {
+		return render_command(word.$render());
+	} else {
+		throw new Error('Invalid word type');
+	}
+}
 
-const render_literal = cmds => $literal(render_string(cmds));
+function render_string(cmds) {
+	return render_block(cmds).join('\n');
+}
+
+function render_verbatim(frag) {
+	if (typeof frag === 'string') {
+		return frag;
+	} else if (frag instanceof Fragment) {
+		return frag.$render();
+	} else {
+		throw new Error('Not a fragment');
+	}
+}
+
+function render_literal(cmds) {
+	return render_verbatim($literal(render_string(cmds)));
+}
+
+function render_command(cmd) {
+	if (typeof cmd === 'string') {
+		return cmd;
+	} else if (cmd instanceof Array) {
+		return cmd.map(render_word).join(' ');
+	} else {
+		throw new Error('Invalid type');
+	}
+}
 
 export default {
-	all: render_all,
-	one: render_one,
-	string: render_string,
-	literal: render_literal
+	block: render_string,
+	verbatim: render_verbatim,
+	literal: render_literal,
+	command: render_command
 };

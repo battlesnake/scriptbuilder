@@ -1,3 +1,5 @@
+import Fragment from './fragment';
+
 const $if = (...cmds) => {
 	const i = [];
 	const t = [];
@@ -18,13 +20,13 @@ const $if = (...cmds) => {
 	};
 	const $else = (...cmds2) => {
 		e.push(...cmds2);
-		return { $render };
+		return new Fragment('block', { $render });
 	};
 	const $then = (...cmds2) => {
 		t.push(...cmds2);
-		return { $render, $else };
+		return new Fragment('block', { $render, $else });
 	};
-	return { $render, $then, $else };
+	return new Fragment('block', { $render, $then, $else });
 };
 
 export default $if;

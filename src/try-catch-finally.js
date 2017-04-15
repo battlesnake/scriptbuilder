@@ -1,3 +1,5 @@
+import Fragment from './fragment';
+
 const $try = (...cmds) => {
 	const t = [];
 	const c = [];
@@ -30,13 +32,13 @@ const $try = (...cmds) => {
 	};
 	const $finally = (...cmds2) => {
 		f.push(...cmds2);
-		return { $render };
+		return new Fragment('block', { $render });
 	};
 	const $catch = (...cmds2) => {
 		c.push(...cmds2);
-		return { $render, $finally };
+		return new Fragment('block', { $render, $finally });
 	};
-	return { $render, $catch, $finally };
+	return new Fragment('block', { $render, $catch, $finally });
 };
 
 export default $try;

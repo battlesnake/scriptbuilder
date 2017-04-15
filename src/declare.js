@@ -1,3 +1,4 @@
+import Fragment from './fragment';
 import $literal from './literal';
 
 const $declare = name => {
@@ -20,26 +21,26 @@ const $declare = name => {
 	};
 	const $value = val => {
 		value = $literal(val);
-		return { $render };
+		return new Fragment('command', { $render });
 	};
 	const $expr = val => {
 		value = val;
-		return { $render };
+		return new Fragment('command', { $render });
 	};
 	const $eval = expr => {
 		value = `"$(${expr})"`;
-		return { $render };
+		return new Fragment('command', { $render });
 	};
 	const $integer = (expr = 0) => {
 		integer = true;
 		value = expr;
-		return { $render, $value, $expr, $eval };
+		return new Fragment('command', { $render, $value, $expr, $eval });
 	};
 	const $mutable = () => {
 		mutable = true;
-		return { $render, $integer, $value, $expr, $eval };
+		return new Fragment('command', { $render, $integer, $value, $expr, $eval });
 	};
-	return { $render, $integer, $mutable, $value, $expr, $eval };
+	return new Fragment('command', { $render, $integer, $mutable, $value, $expr, $eval });
 };
 
 export default $declare;

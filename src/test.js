@@ -5,11 +5,11 @@ const { describe, it } = global;
 const { expect } = chai;
 chai.should();
 
-import { $if, $try, $echo, $declare, render } from '../';
+import { $if, $try, $echo, $declare, $literal, render } from '../';
 import { spawnSync } from 'child_process';
 
 const assert = (status, output, description, script) => it(description, () => {
-	const embedded = render.all(script).join('\n');
+	const embedded = render.block(script);
 	const cp = spawnSync('bash', ['-Eeuo', 'pipefail', '-c', embedded], { stdio: ['ignore', 'pipe', 'ignore'] });
 	expect(cp.error).to.equal(void 0);
 	expect(cp.signal).to.equal(null);
@@ -18,11 +18,14 @@ const assert = (status, output, description, script) => it(description, () => {
 });
 
 describe('Render', () => {
-	it('commands to literal', () => {
+	it('block', () => {
+		expect(render.block(['true', 'false'])).to.equal('true\nfalse');
+	});
+	it('literal', () => {
 		expect(render.literal(['true', 'false'])).to.equal('\'true\nfalse\'');
 	});
-	it('commands to string', () => {
-		expect(render.string(['true', 'false'])).to.equal('true\nfalse');
+	it('command', () => {
+		expect(render.command(['tar', 'czf', 'potato.tar.gz', $literal('eesti stuff')])).to.equal('tar czf potato.tar.gz \'eesti stuff\'');
 	});
 });
 
@@ -112,7 +115,7 @@ describe('Composition', () => {
 });
 
 describe('Variable declaration', () => {
-	const test = (expr, str) => expect(render.all(expr).join('\n')).to.equal(str);
+	const test = (expr, str) => expect(render.block(expr)).to.equal(str);
 	it('String', () => {
 		test($declare('name'), 'declare -r name');
 		test($declare('name').$integer(), 'declare -ri name=0');
