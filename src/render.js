@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import $literal from './literal';
 
 const indent = s => `\t${s}`;
 
@@ -29,12 +30,13 @@ function render_all(cmds) {
 	}
 }
 
-function render_string(cmds) {
-	return render_all(cmds).join('\n');
-}
+const render_string = cmds => render_all(cmds).join('\n');
+
+const render_literal = cmds => $literal(render_string(cmds));
 
 export default {
 	all: render_all,
 	one: render_one,
-	string: render_string
+	string: render_string,
+	literal: render_literal
 };

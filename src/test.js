@@ -17,6 +17,15 @@ const assert = (status, output, description, script) => it(description, () => {
 	expect(cp.stdout.toString('utf8')).to.equal(output);
 });
 
+describe('Render', () => {
+	it('commands to literal', () => {
+		expect(render.literal(['true', 'false'])).to.equal('\'true\nfalse\'');
+	});
+	it('commands to string', () => {
+		expect(render.string(['true', 'false'])).to.equal('true\nfalse');
+	});
+});
+
 describe('$try...catch...finally (no error)', () => {
 	assert(0, 'try\nfinally\n',
 		'try/catch/finally',
