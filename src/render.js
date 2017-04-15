@@ -11,6 +11,8 @@ function render_one(cmd) {
 		return [cmd];
 	} else if (cmd instanceof Array) {
 		return render_block(cmd).map(indent);
+	} else if (cmd === null) {
+		return [];
 	} else {
 		return render_block(cmd);
 	}
@@ -23,6 +25,8 @@ function render_block(cmds) {
 		return render_block(cmds.$render());
 	} else if (cmds instanceof Array) {
 		return _.flatMap(cmds, render_one);
+	} else if (cmds === null) {
+		return [];
 	} else {
 		if (process.env.DEBUG) {
 			console.error('Error term:', cmds);
