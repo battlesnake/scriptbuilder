@@ -1,6 +1,5 @@
 import 'mocha';
 import chai from 'chai';
-import 'blanket';
 
 const { describe, it } = global;
 const { expect } = chai;
