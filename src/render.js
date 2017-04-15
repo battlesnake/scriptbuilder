@@ -63,11 +63,17 @@ function render_literal(cmds) {
 	return render_verbatim($literal(render_string(cmds)));
 }
 
-function render_command(cmd) {
+function render_command(...words) {
+	if (words.length === 0) {
+		throw new Error('No command specified');
+	} else if (words.length > 1) {
+		return render_command(words);
+	}
+	const [cmd] = words;
 	if (typeof cmd === 'string') {
 		return cmd;
 	} else if (cmd instanceof Array) {
-		return cmd.map(render_word).join(' ');
+		return cmd.filter(x => x !== null).map(render_word).join(' ');
 	} else {
 		throw new Error('Invalid type');
 	}
