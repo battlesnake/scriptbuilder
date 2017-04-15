@@ -1,4 +1,4 @@
-const Literal = (...args) => {
+const $literal = (...args) => {
 	if (args.length !== 1 || typeof args[0] !== 'string') {
 		throw new Error('One string argument expected');
 	}
@@ -7,6 +7,6 @@ const Literal = (...args) => {
 	return no_quote ? s : `'${s.replace(/'/g, '\'\\\'\'')}'`;
 };
 
-Literal.list = (...args) => args.map(s => Literal(s));
+$literal.list = (...args) => args.map(s => $literal(s));
 
-export default Literal;
+export default $literal;

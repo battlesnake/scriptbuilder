@@ -1,4 +1,4 @@
-const Try = (...cmds) => {
+const $try = (...cmds) => {
 	const t = [];
 	const c = [];
 	const f = [];
@@ -28,22 +28,15 @@ const Try = (...cmds) => {
 			')'
 		];
 	};
-	return {
-		Catch: (...cmds2) => {
-			c.push(...cmds2);
-			return {
-				Finally: (...cmds3) => {
-					f.push(...cmds3);
-					return { $render };
-				},
-				$render
-			};
-		},
-		Finally: (...cmds2) => {
-			f.push(...cmds2);
-			return { $render };
-		}
+	const $finally = (...cmds2) => {
+		f.push(...cmds2);
+		return { $render };
 	};
+	const $catch = (...cmds2) => {
+		c.push(...cmds2);
+		return { $render, $finally };
+	};
+	return { $render, $catch, $finally };
 };
 
-export default Try;
+export default $try;

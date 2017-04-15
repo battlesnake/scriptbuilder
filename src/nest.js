@@ -1,5 +1,5 @@
-import Literal from './literal';
+import $literal from './literal';
 
-const Nest = (...args) => Literal(args.map(x => x instanceof Array ? Nest(...x) : x).join(' '));
+const $nest = (...args) => $literal(args.map(x => x instanceof Array ? $nest(...x) : x).join(' '));
 
-export default Nest;
+export default $nest;

@@ -1,5 +1,5 @@
-import Literal from './literal';
+import $literal from './literal';
 
-const Echo = text => `echo ${Literal(text)}`;
+const $echo = text => `echo ${$literal(text)}`;
 
-export default Echo;
+export default $echo;

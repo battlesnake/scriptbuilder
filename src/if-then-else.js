@@ -1,4 +1,4 @@
-const If = (...cmds) => {
+const $if = (...cmds) => {
 	const i = [];
 	const t = [];
 	const e = [];
@@ -16,22 +16,15 @@ const If = (...cmds) => {
 		out.push('fi');
 		return out;
 	};
-	return {
-		Then: (...cmds2) => {
-			t.push(...cmds2);
-			return {
-				Else: (...cmds3) => {
-					e.push(...cmds3);
-					return { $render };
-				},
-				$render
-			};
-		},
-		Else: (...cmds2) => {
-			e.push(...cmds2);
-			return { $render };
-		}
+	const $else = (...cmds2) => {
+		e.push(...cmds2);
+		return { $render };
 	};
+	const $then = (...cmds2) => {
+		t.push(...cmds2);
+		return { $render, $else };
+	};
+	return { $render, $then, $else };
 };
 
-export default If;
+export default $if;

@@ -1,13 +1,6 @@
-import _If from './if-then-else';
-import _Try from './try-catch-finally';
-import _Literal from './literal';
-import _Nest from './nest';
-import _Echo from './echo';
-import _render from './render';
-
-export const If = _If;
-export const Try = _Try;
-export const Literal = _Literal;
-export const Nest = _Nest;
-export const Echo = _Echo;
-export const render = _render;
+export { default as $if } from './if-then-else';
+export { default as $try } from './try-catch-finally';
+export { default as $literal } from './literal';
+export { default as $nest } from './nest';
+export { default as $echo } from './echo';
+export { default as render } from './render';
