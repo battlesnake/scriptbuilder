@@ -5,7 +5,7 @@ const { describe, it } = global;
 const { expect } = chai;
 chai.should();
 
-import { $if, $try, $echo, render } from '../';
+import { $if, $try, $echo, $declare, render } from '../';
 import { spawnSync } from 'child_process';
 
 const assert = (status, output, description, script) => it(description, () => {
@@ -100,4 +100,22 @@ describe('Composition', () => {
 	assert(0, 'try\nif\nthen\nfinally\n',
 		'if/then/else within try/catch/finally',
 		$try($echo('try'), $if($echo('if')).$then($echo('then')).$else($echo('else'))).$catch($echo('catch')).$finally($echo('finally')));
+});
+
+describe('Variable declaration', () => {
+	const test = (expr, str) => expect(render.all(expr).join('\n')).to.equal(str);
+	it('String', () => {
+		test($declare('name'), 'declare -r name');
+		test($declare('name').$integer(), 'declare -ri name=0');
+		test($declare('name').$mutable().$integer(2), 'declare -i name=2');
+		test($declare('name').$integer('a+b'), 'declare -ri name=a+b');
+		test($declare('name').$expr('$other'), 'declare -r name=$other');
+		test($declare('name').$eval('whoami'), 'declare -r name="$(whoami)"');
+		test($declare('name').$value('some expression'), 'declare -r name=\'some expression\'');
+	});
+	it('Integer', () => {
+		test($declare('name').$integer(), 'declare -ri name=0');
+		test($declare('name').$mutable().$integer(2), 'declare -i name=2');
+		test($declare('name').$integer('a+b'), 'declare -ri name=a+b');
+	});
 });
