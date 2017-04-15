@@ -5,6 +5,9 @@ const Try = (...cmds) => {
 	t.push(...cmds);
 	const $render = () => {
 		const out = [];
+		out.push('function _try {');
+		out.push(t.length ? t : [':']);
+		out.push('}');
 		if (c.length) {
 			out.push('function _catch {');
 			out.push(c);
@@ -18,9 +21,6 @@ const Try = (...cmds) => {
 			out.push('}');
 			out.push('trap _finally EXIT');
 		}
-		out.push('function _try {');
-		out.push(t.length ? t : [':']);
-		out.push('}');
 		out.push('_try');
 		return [
 			'(',
