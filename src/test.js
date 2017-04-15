@@ -56,10 +56,10 @@ describe('$try...catch...finally (caught error)', () => {
 describe('$try...catch...finally (rethrown error)', () => {
 	assert(1, 'try\ncatch\nfinally\n',
 		'try/catch/finally',
-		$try($echo('try'), 'false').$catch($echo('catch'), 'false').$finally($echo('finally')));
+		$try($echo('try'), 'false').$catch($echo('catch')).$rethrow().$finally($echo('finally')));
 	assert(1, 'try\ncatch\n',
 		'try/catch',
-		$try($echo('try'), 'false').$catch($echo('catch'), 'false'));
+		$try($echo('try'), 'false').$catch($echo('catch')).$rethrow());
 	assert(1, 'try\nfinally\n',
 		'try/finally',
 		$try($echo('try'), 'false').$finally($echo('finally'), 'false'));

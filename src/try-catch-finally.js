@@ -4,6 +4,7 @@ const $try = (...cmds) => {
 	const t = [];
 	const c = [];
 	const f = [];
+	let rethrow = 0;
 	t.push(...cmds);
 	const $render = () => {
 		const out = [];
@@ -13,7 +14,7 @@ const $try = (...cmds) => {
 		if (c.length) {
 			out.push('function _catch {');
 			out.push(c);
-			out.push(['exit 0']);
+			out.push([`exit ${rethrow}`]);
 			out.push('}');
 			out.push('trap _catch ERR');
 		}
@@ -34,9 +35,13 @@ const $try = (...cmds) => {
 		f.push(...cmds2);
 		return new Fragment('block', { $render });
 	};
+	const $rethrow = (code = 1) => {
+		rethrow = code;
+		return new Fragment('block', { $render, $finally });
+	};
 	const $catch = (...cmds2) => {
 		c.push(...cmds2);
-		return new Fragment('block', { $render, $finally });
+		return new Fragment('block', { $render, $rethrow, $finally });
 	};
 	return new Fragment('block', { $render, $catch, $finally });
 };
