@@ -5,17 +5,24 @@ const { describe, it } = global;
 const { expect } = chai;
 chai.should();
 
-import { $if, $try, $echo, $declare, $literal, render } from '../';
+import { $if, $try, $echo, $declare, $literal, $not, $or, $and, $nor, $nand, render } from '../';
 import { spawnSync } from 'child_process';
 
-const assert = (status, output, description, script) => it(description, () => {
-	const embedded = render.block(script);
-	const cp = spawnSync('bash', ['-Eeuo', 'pipefail', '-c', embedded], { stdio: ['ignore', 'pipe', 'ignore'] });
-	expect(cp.error).to.equal(void 0);
-	expect(cp.signal).to.equal(null);
-	expect(cp.status).to.equal(status);
-	expect(cp.stdout.toString('utf8')).to.equal(output);
-});
+const assert = (status, output, description, script) => {
+	const run = () => {
+		const embedded = render.block(script);
+		const cp = spawnSync('bash', ['-Eeuo', 'pipefail', '-c', embedded], { stdio: ['ignore', 'pipe', 'ignore'] });
+		expect(cp.error).to.equal(void 0);
+		expect(cp.signal).to.equal(null);
+		expect(cp.status).to.equal(status);
+		expect(cp.stdout.toString('utf8')).to.equal(output);
+	};
+	if (description === null) {
+		run();
+	} else {
+		it(description, run);
+	}
+};
 
 describe('Render', () => {
 	it('block', () => {
@@ -129,5 +136,36 @@ describe('Variable declaration', () => {
 		test($declare('name').$integer(), 'declare -ri name=0');
 		test($declare('name').$mutable().$integer(2), 'declare -i name=2');
 		test($declare('name').$integer('a+b'), 'declare -ri name=a+b');
+	});
+});
+
+describe('Boolean operators', () => {
+	it('Not', () => {
+		assert(0, '', null, $not('false'));
+		assert(1, '', null, $not('true'));
+	});
+	it('Or', () => {
+		assert(1, '', null, $or('false', 'false'));
+		assert(0, '', null, $or('false', 'true'));
+		assert(0, '', null, $or('true', 'false'));
+		assert(0, '', null, $or('true', 'true'));
+	});
+	it('And', () => {
+		assert(1, '', null, $and('false', 'false'));
+		assert(1, '', null, $and('false', 'true'));
+		assert(1, '', null, $and('true', 'false'));
+		assert(0, '', null, $and('true', 'true'));
+	});
+	it('Nor', () => {
+		assert(0, '', null, $nor('false', 'false'));
+		assert(1, '', null, $nor('false', 'true'));
+		assert(1, '', null, $nor('true', 'false'));
+		assert(1, '', null, $nor('true', 'true'));
+	});
+	it('Nand', () => {
+		assert(0, '', null, $nand('false', 'false'));
+		assert(0, '', null, $nand('false', 'true'));
+		assert(0, '', null, $nand('true', 'false'));
+		assert(1, '', null, $nand('true', 'true'));
 	});
 });
