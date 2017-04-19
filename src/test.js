@@ -25,7 +25,9 @@ import { spawnSync } from 'child_process';
 const assert = (status, output, description, script) => {
 	const run = () => {
 		const embedded = render.block(script);
-		//console.info(embedded);
+		if (process.env.dump) {
+			console.info(embedded);
+		}
 		const cp = spawnSync('bash', ['-Eeuo', 'pipefail', '-c', embedded], { stdio: ['ignore', 'pipe', 'ignore'] });
 		expect(cp.error).to.equal(void 0);
 		expect(cp.signal).to.equal(null);
@@ -103,6 +105,12 @@ describe('$if...then...else (true)', () => {
 	assert(0, '',
 		'if/else',
 		$if('true').$else($echo('no')));
+	assert(0, 'no\n',
+		'if-not/then/else',
+		$if.$not('true').$then($echo('yes')).$else($echo('no')));
+	assert(0, 'yes\n',
+		'if-not/then/else',
+		$if.$not('false').$then($echo('yes')).$else($echo('no')));
 });
 
 describe('$if...then...else (false)', () => {
