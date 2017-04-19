@@ -5,7 +5,21 @@ const { describe, it } = global;
 const { expect } = chai;
 chai.should();
 
-import { $if, $try, $echo, $declare, $literal, $not, $or, $and, $nor, $nand, $eval, render } from '../';
+import {
+	$if,
+	$try,
+	$echo,
+	$declare,
+	$literal,
+	$not,
+	$or,
+	$and,
+	$nor,
+	$nand,
+	$eval,
+	$var,
+	render
+} from '../';
 import { spawnSync } from 'child_process';
 
 const assert = (status, output, description, script) => {
@@ -137,6 +151,25 @@ describe('Variable declaration', () => {
 		test($declare('name').$integer(), 'declare -ri name=0');
 		test($declare('name').$mutable().$integer(2), 'declare -i name=2');
 		test($declare('name').$integer('a+b'), 'declare -ri name=a+b');
+	});
+});
+
+describe('Variable usage', () => {
+	const test = (expr, str) => expect(render.block(expr)).to.equal(str);
+	it('Quoted', () => {
+		test($var('name'), '"${name}"');
+	});
+	it('Unquoted', () => {
+		test($var('name').$noquote(), '${name}');
+	});
+	it('Default value', () => {
+		test($var('name').$default('x'), '"${name:-x}"');
+	});
+	it('Array element', () => {
+		test($var('name').$index('2'), '"${name[2]}"');
+	});
+	it('Array expansion', () => {
+		test($var('name').$all(), '"${name[@]}"');
 	});
 });
 
