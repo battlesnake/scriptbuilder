@@ -5,12 +5,13 @@ const { describe, it } = global;
 const { expect } = chai;
 chai.should();
 
-import { $if, $try, $echo, $declare, $literal, $not, $or, $and, $nor, $nand, render } from '../';
+import { $if, $try, $echo, $declare, $literal, $not, $or, $and, $nor, $nand, $eval, render } from '../';
 import { spawnSync } from 'child_process';
 
 const assert = (status, output, description, script) => {
 	const run = () => {
 		const embedded = render.block(script);
+		//console.info(embedded);
 		const cp = spawnSync('bash', ['-Eeuo', 'pipefail', '-c', embedded], { stdio: ['ignore', 'pipe', 'ignore'] });
 		expect(cp.error).to.equal(void 0);
 		expect(cp.signal).to.equal(null);
@@ -167,5 +168,18 @@ describe('Boolean operators', () => {
 		assert(0, '', null, $nand('false', 'true'));
 		assert(0, '', null, $nand('true', 'false'));
 		assert(1, '', null, $nand('true', 'true'));
+	});
+});
+
+describe('Subexpression', () => {
+	it('Single command', () => {
+		assert(0, 'test\n', null, $eval($echo('echo test')));
+		assert(0, '', null, $eval($echo('true')));
+		assert(1, '', null, $eval($echo('false')));
+	});
+	it('Command block', () => {
+		assert(0, 'hello\nworld\n', null, $eval($echo('echo hello'), $echo('echo world')));
+		assert(0, 'hello\n', null, $eval($echo('echo hello'), 'true'));
+		assert(1, 'hello\n', null, $eval($echo('echo hello'), 'false'));
 	});
 });
