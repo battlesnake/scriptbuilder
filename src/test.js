@@ -214,13 +214,13 @@ describe('Boolean operators', () => {
 
 describe('Subexpression', () => {
 	it('Single command', () => {
-		assert(0, 'test\n', null, $eval($echo('echo test')));
+		assert(0, 'test\n', null, $eval.$noquote($echo('echo test')));
 		assert(0, '', null, $eval($echo('true')));
 		assert(1, '', null, $eval($echo('false')));
 	});
 	it('Command block', () => {
-		assert(0, 'hello\nworld\n', null, $eval($echo('echo hello'), $echo('echo world')));
-		assert(0, 'hello\n', null, $eval($echo('echo hello'), 'true'));
-		assert(1, 'hello\n', null, $eval($echo('echo hello'), 'false'));
+		assert(0, 'hello\nworld\n', null, $eval.$noquote($echo('echo hello'), $echo('echo world')));
+		assert(0, 'hello\n', null, $eval.$noquote($echo('echo hello'), 'true'));
+		assert(1, 'hello\n', null, $eval.$noquote($echo('echo hello'), 'false'));
 	});
 });
