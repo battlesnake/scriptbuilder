@@ -36,8 +36,8 @@ function render_block(cmds) {
 }
 
 function render_word(word) {
-	if (typeof word === 'string') {
-		return word;
+	if (_.contains(['string', 'number', 'boolean'], typeof word)) {
+		return String(word);
 	} else if (word instanceof Fragment) {
 		return render_command(word.$render());
 	} else {
