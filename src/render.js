@@ -6,9 +6,11 @@ const indent = s => `\t${s}`;
 
 const is_block = cmd => cmd instanceof Fragment;
 
+const stringable = x => _.includes(['string', 'number', 'boolean'], typeof x);
+
 function render_one(cmd) {
-	if (typeof cmd === 'string') {
-		return [cmd];
+	if (stringable(cmd)) {
+		return [String(cmd)];
 	} else if (cmd instanceof Array) {
 		return render_block(cmd).map(indent);
 	} else if (cmd === null) {
@@ -19,8 +21,8 @@ function render_one(cmd) {
 }
 
 function render_block(cmds) {
-	if (typeof cmds === 'string') {
-		return [cmds];
+	if (stringable(cmds)) {
+		return [String(cmds)];
 	} else if (is_block(cmds)) {
 		return render_block(cmds.$render());
 	} else if (cmds instanceof Array) {
@@ -36,7 +38,7 @@ function render_block(cmds) {
 }
 
 function render_word(word) {
-	if (_.contains(['string', 'number', 'boolean'], typeof word)) {
+	if (stringable(word)) {
 		return String(word);
 	} else if (word instanceof Fragment) {
 		return render_command(word.$render());
