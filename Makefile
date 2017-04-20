@@ -7,6 +7,8 @@ MAKEFLAGS += -srR
 in = $(wildcard $(src)/*.js $(src)/*/*.js)
 out = $(in:$(src)/%=$(bin)/%)
 
+test_out = $(test)/index.js $(test)/test.js
+
 .PHONY: all
 all: build test
 
@@ -15,10 +17,10 @@ clean:
 	rm -rf -- $(bin) $(test)
 
 .PHONY: build
-build: $(out)
+build: $(out) $(test_out)
 
 .PHONY: test
-test: build $(test)/index.js $(test)/test.js
+test: build $(test_out)
 	mocha
 
 $(out): $(bin)/%: $(src)/%

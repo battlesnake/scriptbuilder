@@ -1,5 +1,6 @@
 import $literal from './literal';
+import render from './render';
 
-const $nest = (...args) => $literal(args.map(x => x instanceof Array ? $nest(...x) : x).join(' '));
+const $nest = (...args) => $literal(render.command(args));
 
 export default $nest;

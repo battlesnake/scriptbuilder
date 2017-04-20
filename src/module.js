@@ -11,4 +11,5 @@ export { default as $nor } from './nor';
 export { default as $nand } from './nand';
 export { default as $eval } from './eval';
 export { default as $var } from './var';
+export { default as $line } from './line';
 export { default as render } from './render';

@@ -1,6 +1,6 @@
-import Fragment from './fragment';
+import $line from './line';
 import $literal from './literal';
 
-const $echo = text => new Fragment('command', { $render: () => `echo ${$literal(text)}` });
+const $echo = text => $line('echo', $literal(text));
 
 export default $echo;

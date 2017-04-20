@@ -11,6 +11,7 @@ import {
 	$echo,
 	$declare,
 	$literal,
+	$nest,
 	$not,
 	$or,
 	$and,
@@ -18,6 +19,7 @@ import {
 	$nand,
 	$eval,
 	$var,
+	$line,
 	render
 } from '../';
 import { spawnSync } from 'child_process';
@@ -50,6 +52,16 @@ describe('Render', () => {
 	});
 	it('command', () => {
 		expect(render.command(['tar', 'czf', 'potato.tar.gz', $literal('eesti stuff')])).to.equal('tar czf potato.tar.gz \'eesti stuff\'');
+	});
+	it('nesting', () => {
+		assert(0, 'hello\n', null,
+			$line('sh', '-c', $nest($echo('hello'))));
+		assert(0, 'tere tulemast\n', null,
+			$line('sh', '-c', $nest($echo('tere tulemast'))));
+		assert(0, 'tere, $USER\n', null,
+			$line('sh', '-c', $nest($echo('tere, $USER'))));
+		assert(0, 'head isu, $USER\'s pig\n', null,
+			$line('sh', '-c', $nest($echo('head isu, $USER\'s pig'))));
 	});
 });
 

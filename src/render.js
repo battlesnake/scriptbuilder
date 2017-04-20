@@ -37,16 +37,6 @@ function render_block(cmds) {
 	}
 }
 
-function render_word(word) {
-	if (stringable(word)) {
-		return String(word);
-	} else if (word instanceof Fragment) {
-		return render_command(word.$render());
-	} else {
-		throw new Error('Invalid word type');
-	}
-}
-
 function render_string(cmds) {
 	return render_block(cmds).join('\n');
 }
@@ -65,19 +55,30 @@ function render_literal(cmds) {
 	return render_verbatim($literal(render_string(cmds)));
 }
 
+function render_word(word) {
+	if (stringable(word)) {
+		return String(word);
+	} else if (word instanceof Fragment) {
+		return render_command(word.$render());
+	} else {
+		throw new Error(`Invalid word type: ${typeof word}`);
+	}
+}
+
 function render_command(...words) {
 	if (words.length === 0) {
 		throw new Error('No command specified');
 	} else if (words.length > 1) {
 		return render_command(words);
-	}
-	const [cmd] = words;
-	if (typeof cmd === 'string') {
-		return cmd;
-	} else if (cmd instanceof Array) {
-		return cmd.filter(x => x !== null).map(render_word).join(' ');
 	} else {
-		throw new Error('Invalid type');
+		const cmd = words[0];
+		if (typeof cmd === 'string') {
+			return cmd;
+		} else if (cmd instanceof Array) {
+			return cmd.filter(x => x !== null).map(render_word).join(' ');
+		} else {
+			throw new Error(`Invalid type: ${typeof cmd}`);
+		}
 	}
 }
 
