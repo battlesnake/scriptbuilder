@@ -76,6 +76,8 @@ function render_command(...words) {
 			return cmd;
 		} else if (cmd instanceof Array) {
 			return cmd.filter(x => x !== null).map(render_word).join(' ');
+		} else if (cmd instanceof Fragment) {
+			return render_verbatim(cmd);
 		} else {
 			throw new Error(`Invalid type: ${typeof cmd}`);
 		}
