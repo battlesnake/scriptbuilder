@@ -1,9 +1,12 @@
+require('source-map-support').install();
+
 import 'mocha';
 import chai from 'chai';
 
 const { describe, it } = global;
 const { expect } = chai;
-chai.should();
+
+import { spawnSync } from 'child_process';
 
 import {
 	$if,
@@ -22,7 +25,6 @@ import {
 	$line,
 	render
 } from '../';
-import { spawnSync } from 'child_process';
 
 const assert = (status, output, description, script) => {
 	const run = () => {

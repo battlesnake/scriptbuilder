@@ -1,36 +1,21 @@
-src = src
-bin = bin
-test = test
+srcdir = src
+outdir = bin
 
-MAKEFLAGS += -srR
-
-in = $(wildcard $(src)/*.js $(src)/*/*.js)
-out = $(in:$(src)/%=$(bin)/%)
-
-test_out = $(test)/index.js $(test)/test.js
+export PATH := $(CURDIR)/node_modules/.bin:$(PATH)
 
 .PHONY: all
-all: build test
+all: build
 
 .PHONY: clean
 clean:
-	rm -rf -- $(bin) $(test)
+	rm -rf -- coverage $(outdir)
 
 .PHONY: build
-build: $(out) $(test_out)
+build:
+	@mkdir -p $(outdir)
+	babel --copy-files --out-dir $(outdir) $(srcdir)
 
 .PHONY: test
-test: build $(test_out)
-	mocha
-
-$(out): $(bin)/%: $(src)/%
-	@mkdir -p $(@D)
-	babel --source-maps inline --presets latest -o $@ $^
-
-$(test)/index.js: $(test)/test.js
-	@mkdir -p $(@D)
-	printf "%s\n" '#!/usr/bin/env nodejs' 'require("source-map-support").install();' 'require("babel-polyfill");' 'require("./test");' > $@
-
-$(test)/%.js: $(bin)/%.js
-	@mkdir -p $(@D)
-	cp $< $@
+test: build
+	rm -rf coverage
+	DEBUG=y BABEL_ENV=test istanbul cover _mocha -- $(patsubst %, --grep "^(%)", $(tests)) --require babel-polyfill --use_strict --slow 1000 --timeout 10000 $(outdir)/test
