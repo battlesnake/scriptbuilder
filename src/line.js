@@ -2,14 +2,14 @@ import Fragment from './fragment';
 
 const $line = (...args) => {
 	const $render = () => {
-		return args.map(x => {
+		return args.map((x, i) => {
 			if (x instanceof Fragment) {
 				return x.$render();
 			} else if (typeof x === 'string') {
 				return x;
-			} else /* istanbul ignore next */ {
+			} else {
 				console.dir(args);
-				throw new Error(`Invalid type: ${typeof x}`);
+				throw new Error(`Expected fragments of type "string" or "Fragment" for $line.$render, but element[${i}] has type: ${typeof x}`);
 			}
 		}).join(' ');
 	};

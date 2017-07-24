@@ -1,7 +1,15 @@
 import Fragment from './fragment';
 import $literal from './literal';
 
-const $declare = name => {
+const s_local = Symbol('local');
+
+const $declare = (name, ...args) => {
+	let local = false;
+	if (name === s_local) {
+		name = args[0];
+		args.shift();
+		local = true;
+	}
 	let value = null;
 	let mutable = false;
 	let integer = false;
@@ -14,7 +22,7 @@ const $declare = name => {
 			flags += 'i';
 		}
 		return [
-			'declare',
+			local ? 'local' : 'declare',
 			...(flags.length ? [`-${flags}`] : []),
 			name + (value === null ? '' : `=${value}`)
 		].join(' ');
@@ -42,5 +50,7 @@ const $declare = name => {
 	};
 	return new Fragment('command', { $render, $integer, $mutable, $value, $expr, $eval });
 };
+
+$declare.s_local = s_local;
 
 export default $declare;

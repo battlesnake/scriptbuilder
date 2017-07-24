@@ -10,7 +10,7 @@ const $eval = (...args) => {
 	}
 	/* istanbul ignore if */
 	if (args.length === 0) {
-		throw new Error('Subexpression expected');
+		throw new Error('Subexpression expected for $eval');
 	}
 	const $render = () => {
 		const res = args.map(x => `$(${render.block(x)})`);

@@ -26,7 +26,7 @@ const $if = (...cmds) => {
 		out.push(t.length ? t : [':']);
 		if (e.length) {
 			out.push('else');
-			out.push(e.length ? e : [':']);
+			out.push(e);
 		}
 		out.push('fi');
 		return out;

@@ -4,6 +4,7 @@ export { default as $literal } from './literal';
 export { default as $nest } from './nest';
 export { default as $echo } from './echo';
 export { default as $declare } from './declare';
+export { default as $local } from './local';
 export { default as $not } from './not';
 export { default as $or } from './or';
 export { default as $and } from './and';

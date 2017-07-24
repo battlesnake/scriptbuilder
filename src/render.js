@@ -30,9 +30,7 @@ function render_block(cmds) {
 	} else if (cmds === null) {
 		return [];
 	} else {
-		if (process.env.DEBUG) {
-			console.error('Error term:', cmds);
-		}
+		console.dir(cmds);
 		throw new Error('Failed to render command block');
 	}
 }

@@ -13,6 +13,7 @@ import {
 	$try,
 	$echo,
 	$declare,
+	$local,
 	$literal,
 	$nest,
 	$not,
@@ -50,7 +51,7 @@ describe('Render', () => {
 		expect(String(render.block(null))).to.equal('');
 		expect(String(render.block([null]))).to.equal('');
 		expect(render.block(['true', 'false'])).to.equal('true\nfalse');
-		expect(() => render.block(undefined)).to.throw();
+		expect(() => render.block(void 0)).to.throw();
 	});
 	it('literal', () => {
 		expect(render.literal(['true', 'false'])).to.equal('\'true\nfalse\'');
@@ -65,7 +66,7 @@ describe('Render', () => {
 		expect(render.command($echo('hello world'))).to.equal('echo \'hello world\'');
 		expect(() => render.command()).to.throw();
 		expect(() => render.command(null)).to.throw();
-		expect(() => render.command([undefined])).to.throw();
+		expect(() => render.command([void 0])).to.throw();
 	});
 	it('nesting', () => {
 		assert(0, 'hello\n', null,
@@ -77,6 +78,35 @@ describe('Render', () => {
 		assert(0, 'head isu, $USER\'s pig\n', null,
 			$line('sh', '-c', $nest($echo('head isu, $USER\'s pig'))));
 	});
+});
+
+describe('$line', () => {
+	it('Invalid input', () => {
+		expect(() => $line(null).$render()).to.throw();
+		expect(() => $line('first-is-valid', null).$render()).to.throw();
+	});
+});
+
+describe('$literal', () => {
+	it('Invalid input', () => {
+		expect(() => $literal(null).$render()).to.throw();
+		expect(() => $literal('a', 'b').$render()).to.throw();
+	});
+});
+
+describe('$try...catch...finally (empty blocks)', () => {
+	assert(0, 'finally\n',
+		'Empty try',
+		$try().$catch($echo('catch')).$finally($echo('finally')));
+	assert(0, 'try\n',
+		'Empty finally',
+		$try($echo('try')).$catch($echo('catch')).$finally());
+	assert(0, 'try\n',
+		'Empty catch + no finally',
+		$try($echo('try'), 'false').$catch());
+	assert(0, 'try\nfinally\n',
+		'Empty catch',
+		$try($echo('try'), 'false').$catch().$finally($echo('finally')));
 });
 
 describe('$try...catch...finally (no error)', () => {
@@ -103,15 +133,31 @@ describe('$try...catch...finally (caught error)', () => {
 		$try($echo('try'), 'false').$finally($echo('finally')));
 });
 
-describe('$try...catch...finally (rethrown error)', () => {
+describe('$try...catch...finally (rethrow default error)', () => {
 	assert(1, 'try\ncatch\nfinally\n',
 		'try/catch/finally',
 		$try($echo('try'), 'false').$catch($echo('catch')).$rethrow().$finally($echo('finally')));
 	assert(1, 'try\ncatch\n',
 		'try/catch',
 		$try($echo('try'), 'false').$catch($echo('catch')).$rethrow());
+});
+describe('$try...catch...finally (rethrow new error)', () => {
+	assert(2, 'try\ncatch\nfinally\n',
+		'try/catch/finally',
+		$try($echo('try'), 'false').$catch($echo('catch')).$rethrow(2).$finally($echo('finally')));
+	assert(2, 'try\ncatch\n',
+		'try/catch',
+		$try($echo('try'), 'false').$catch($echo('catch')).$rethrow(2));
+});
+describe('$try...catch...finally (error in "finally")', () => {
 	assert(1, 'try\nfinally\n',
 		'try/finally',
+		$try($echo('try')).$finally($echo('finally'), 'false'));
+	assert(1, 'try\ncatch\nfinally\n',
+		'try(throw)/catch',
+		$try($echo('try'), 'false').$catch($echo('catch')).$rethrow(2).$finally($echo('finally'), 'false'));
+	assert(1, 'try\nfinally\n',
+		'try(throw)/finally',
 		$try($echo('try'), 'false').$finally($echo('finally'), 'false'));
 });
 
@@ -179,10 +225,16 @@ describe('Variable declaration', () => {
 		test($declare('name').$eval('whoami'), 'declare -r name="$(whoami)"');
 		test($declare('name').$value('some expression'), 'declare -r name=\'some expression\'');
 	});
+	it('Mutable', () => {
+		test($declare('name').$mutable(), 'declare name');
+	});
 	it('Integer', () => {
 		test($declare('name').$integer(), 'declare -ri name=0');
 		test($declare('name').$mutable().$integer(2), 'declare -i name=2');
 		test($declare('name').$integer('a+b'), 'declare -ri name=a+b');
+	});
+	it('Local function variable', () => {
+		test($local('name'), 'local -r name');
 	});
 });
 
@@ -206,6 +258,11 @@ describe('Variable usage', () => {
 	it('Multiple', () => {
 		test($var.$list('one', 'two', 'three'), '"${one}"\n"${two}"\n"${three}"');
 	});
+	it('Invalid parameters', () => {
+		expect(() => $var()).to.throw();
+		expect(() => $var(null)).to.throw();
+		expect(() => $var('var', 'more')).to.throw();
+	});
 });
 
 describe('Boolean operators', () => {
@@ -214,14 +271,20 @@ describe('Boolean operators', () => {
 		assert(1, '', null, $not('true'));
 	});
 	it('Or', () => {
+		assert(1, '', null, $or());
+		assert(1, '', null, $or('false'));
 		assert(1, '', null, $or('false', 'false'));
+		assert(0, '', null, $or('true'));
 		assert(0, '', null, $or('false', 'true'));
 		assert(0, '', null, $or('true', 'false'));
 		assert(0, '', null, $or('true', 'true'));
 	});
 	it('And', () => {
+		assert(1, '', null, $and('false'));
 		assert(1, '', null, $and('false', 'false'));
 		assert(1, '', null, $and('false', 'true'));
+		assert(0, '', null, $and());
+		assert(0, '', null, $and('true'));
 		assert(1, '', null, $and('true', 'false'));
 		assert(0, '', null, $and('true', 'true'));
 	});

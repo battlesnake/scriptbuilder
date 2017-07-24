@@ -1,9 +1,13 @@
 import Fragment from './fragment';
 
 const $literal = (...args) => {
-	/* istanbul ignore if */
-	if (args.length !== 1 || typeof args[0] !== 'string') {
-		throw new Error('One string argument expected (did you mean $nest?)');
+	if (args.length !== 1) {
+		console.dir(args);
+		throw new Error(`Exactly one argument expected for $literal, but ${args} received (did you mean $nest?)`);
+	}
+	if (typeof args[0] !== 'string') {
+		console.dir(args);
+		throw new Error(`Exactly one string argument expected for $literal but argument of type ${typeof args[0]} received (did you mean $nest?)`);
 	}
 	const s = args[0];
 	const no_quote = /^[A-Za-z0-9-+%._=/]+$/.test(s);

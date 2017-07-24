@@ -1,9 +1,13 @@
 import Fragment from './fragment';
 
 const $var = (...args) => {
-	/* istanbul ignore next */
-	if (args.length !== 1 || typeof args[0] !== 'string') {
-		throw new Error('One string argument expected');
+	if (args.length !== 1) {
+		console.dir(args);
+		throw new Error(`Exactly one argument expected for $var, but ${args} received`);
+	}
+	if (typeof args[0] !== 'string') {
+		console.dir(args);
+		throw new Error(`Exactly one string argument expected for $var but argument of type ${typeof args[0]} received`);
 	}
 	let quote = true;
 	let index = null;
