@@ -1,6 +1,7 @@
 import Fragment from './fragment';
 
 const $var = (...args) => {
+	/* istanbul ignore next */
 	if (args.length !== 1 || typeof args[0] !== 'string') {
 		throw new Error('One string argument expected');
 	}
@@ -33,6 +34,6 @@ const $var = (...args) => {
 	return new Fragment('verbatim', { $render, $noquote, $index, $all, $default });
 };
 
-$var.list = (...args) => args.map(s => $var(s));
+$var.$list = (...args) => args.map(s => $var(s));
 
 export default $var;

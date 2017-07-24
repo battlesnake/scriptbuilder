@@ -47,13 +47,25 @@ const assert = (status, output, description, script) => {
 
 describe('Render', () => {
 	it('block', () => {
+		expect(String(render.block(null))).to.equal('');
+		expect(String(render.block([null]))).to.equal('');
 		expect(render.block(['true', 'false'])).to.equal('true\nfalse');
+		expect(() => render.block(undefined)).to.throw();
 	});
 	it('literal', () => {
 		expect(render.literal(['true', 'false'])).to.equal('\'true\nfalse\'');
 	});
+	it('verbatim', () => {
+		expect(render.verbatim('some example text')).to.equal('some example text');
+		expect(() => render.verbatim(null)).to.throw();
+	});
 	it('command', () => {
+		expect(render.command('tar', 'czf', 'potato.tar.gz', $literal('eesti stuff'))).to.equal('tar czf potato.tar.gz \'eesti stuff\'');
 		expect(render.command(['tar', 'czf', 'potato.tar.gz', $literal('eesti stuff')])).to.equal('tar czf potato.tar.gz \'eesti stuff\'');
+		expect(render.command($echo('hello world'))).to.equal('echo \'hello world\'');
+		expect(() => render.command()).to.throw();
+		expect(() => render.command(null)).to.throw();
+		expect(() => render.command([undefined])).to.throw();
 	});
 	it('nesting', () => {
 		assert(0, 'hello\n', null,
@@ -148,6 +160,7 @@ describe('$echo & escaping', () => {
 	echo_literal_test('c:\\windows\\system32\\backslash');
 	echo_literal_test('/some/path/to-a-file/a_b_c.xyz');
 	echo_literal_test('http://user:password@some-domain.tld:port/path/to/item?key=value&key2=value2#search');
+	expect(render.command($literal.$list('return', '42'))).to.equal('return 42');
 });
 
 	//	dump(['ssh', 'root@host', $nest('sh', '-c', $nest('printf', ...$literal.list('%s\\n', 'Hello world!')))].join(' '));
@@ -162,9 +175,6 @@ describe('Variable declaration', () => {
 	const test = (expr, str) => expect(render.block(expr)).to.equal(str);
 	it('String', () => {
 		test($declare('name'), 'declare -r name');
-		test($declare('name').$integer(), 'declare -ri name=0');
-		test($declare('name').$mutable().$integer(2), 'declare -i name=2');
-		test($declare('name').$integer('a+b'), 'declare -ri name=a+b');
 		test($declare('name').$expr('$other'), 'declare -r name=$other');
 		test($declare('name').$eval('whoami'), 'declare -r name="$(whoami)"');
 		test($declare('name').$value('some expression'), 'declare -r name=\'some expression\'');
@@ -192,6 +202,9 @@ describe('Variable usage', () => {
 	});
 	it('Array expansion', () => {
 		test($var('name').$all(), '"${name[@]}"');
+	});
+	it('Multiple', () => {
+		test($var.$list('one', 'two', 'three'), '"${one}"\n"${two}"\n"${three}"');
 	});
 });
 
@@ -229,6 +242,7 @@ describe('Boolean operators', () => {
 describe('Subexpression', () => {
 	it('Single command', () => {
 		assert(0, 'test\n', null, $eval.$noquote($echo('echo test')));
+		assert(0, 'test\n', null, $eval($echo('echo test')).$noquote());
 		assert(0, '', null, $eval($echo('true')));
 		assert(1, '', null, $eval($echo('false')));
 	});

@@ -7,7 +7,7 @@ const $line = (...args) => {
 				return x.$render();
 			} else if (typeof x === 'string') {
 				return x;
-			} else {
+			} else /* istanbul ignore next */ {
 				console.dir(args);
 				throw new Error(`Invalid type: ${typeof x}`);
 			}

@@ -1,6 +1,7 @@
 import Fragment from './fragment';
 
 const $literal = (...args) => {
+	/* istanbul ignore if */
 	if (args.length !== 1 || typeof args[0] !== 'string') {
 		throw new Error('One string argument expected (did you mean $nest?)');
 	}
@@ -10,6 +11,6 @@ const $literal = (...args) => {
 	return new Fragment('verbatim', { $render });
 };
 
-$literal.list = (...args) => args.map(s => $literal(s));
+$literal.$list = (...args) => args.map(s => $literal(s));
 
 export default $literal;

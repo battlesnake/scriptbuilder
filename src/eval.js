@@ -8,6 +8,7 @@ const $eval = (...args) => {
 	if (!quote) {
 		args.shift();
 	}
+	/* istanbul ignore if */
 	if (args.length === 0) {
 		throw new Error('Subexpression expected');
 	}
