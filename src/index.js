@@ -13,4 +13,5 @@ export { default as $nand } from './nand';
 export { default as $eval } from './eval';
 export { default as $var } from './var';
 export { default as $line } from './line';
+export { default as $pipe } from './pipe';
 export { default as render } from './render';

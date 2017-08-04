@@ -24,6 +24,7 @@ import {
 	$eval,
 	$var,
 	$line,
+	$pipe,
 	render
 } from '../';
 
@@ -45,6 +46,8 @@ const assert = (status, output, description, script) => {
 		it(description, run);
 	}
 };
+
+const test = (expr, str) => expect(render.block(expr)).to.equal(str);
 
 describe('Render', () => {
 	it('block', () => {
@@ -218,7 +221,6 @@ describe('Composition', () => {
 });
 
 describe('Variable declaration', () => {
-	const test = (expr, str) => expect(render.block(expr)).to.equal(str);
 	it('String', () => {
 		test($declare('name'), 'declare -r name');
 		test($declare('name').$expr('$other'), 'declare -r name=$other');
@@ -242,7 +244,6 @@ describe('Variable declaration', () => {
 });
 
 describe('Variable usage', () => {
-	const test = (expr, str) => expect(render.block(expr)).to.equal(str);
 	it('Quoted', () => {
 		test($var('name'), '"${name}"');
 	});
@@ -316,5 +317,13 @@ describe('Subexpression', () => {
 		assert(0, 'hello\nworld\n', null, $eval.$noquote($echo('echo hello'), $echo('echo world')));
 		assert(0, 'hello\n', null, $eval.$noquote($echo('echo hello'), 'true'));
 		assert(1, 'hello\n', null, $eval.$noquote($echo('echo hello'), 'false'));
+	});
+});
+
+describe('Pipelines', () => {
+	it('Pipe', () => {
+		test($pipe(), ':');
+		test($pipe('cat', 'tac'), '( cat ) | ( tac )');
+		test($pipe('cat', $pipe('tac', 'cat'), 'tac'), '( cat ) | ( ( tac ) | ( cat ) ) | ( tac )');
 	});
 });
