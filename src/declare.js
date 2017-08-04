@@ -13,6 +13,7 @@ const $declare = (name, ...args) => {
 	let value = null;
 	let mutable = false;
 	let integer = false;
+	let export_ = false;
 	const $render = () => {
 		let flags = '';
 		if (!mutable) {
@@ -21,23 +22,30 @@ const $declare = (name, ...args) => {
 		if (integer) {
 			flags += 'i';
 		}
+		if (export_) {
+			flags += 'x';
+		}
 		return [
 			local ? 'local' : 'declare',
 			...(flags.length ? [`-${flags}`] : []),
 			name + (value === null ? '' : `=${value}`)
 		].join(' ');
 	};
+	const $export = () => {
+		export_ = true;
+		return new Fragment('command', { $render });
+	};
 	const $value = val => {
 		value = $literal(val);
-		return new Fragment('command', { $render });
+		return new Fragment('command', { $render, $export });
 	};
 	const $expr = val => {
 		value = val;
-		return new Fragment('command', { $render });
+		return new Fragment('command', { $render, $export });
 	};
 	const $eval = expr => {
 		value = `"$(${expr})"`;
-		return new Fragment('command', { $render });
+		return new Fragment('command', { $render, $export });
 	};
 	const $integer = (expr = 0) => {
 		integer = true;

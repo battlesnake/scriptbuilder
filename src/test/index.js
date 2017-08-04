@@ -228,6 +228,9 @@ describe('Variable declaration', () => {
 	it('Mutable', () => {
 		test($declare('name').$mutable(), 'declare name');
 	});
+	it('Exported', () => {
+		test($declare('name').$value('potato').$export(), 'declare -rx name=potato');
+	});
 	it('Integer', () => {
 		test($declare('name').$integer(), 'declare -ri name=0');
 		test($declare('name').$mutable().$integer(2), 'declare -i name=2');
