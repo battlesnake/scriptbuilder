@@ -13,7 +13,7 @@ const $eval = (...args) => {
 		throw new Error('Subexpression expected for $eval');
 	}
 	const $render = () => {
-		const res = args.map(x => `$(${render.block(x)})`);
+		const res = args.map(x => `$( ${render.block(x)} )`);
 		return quote ? `"${res}"` : res;
 	};
 	const $noquote = () => {
